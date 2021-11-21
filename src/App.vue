@@ -1,15 +1,21 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Welcome to Your Vue.js App" />
+  <game></game>
+  <rank v-if="showRank"></rank>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
-
+import rank from "./components/rank.vue";
+import game from "./components/game.vue";
 export default {
   name: "App",
   components: {
-    HelloWorld,
+    rank,
+    game,
+  },
+  data() {
+    return {
+      showRank: false,
+    };
   },
 };
 </script>
