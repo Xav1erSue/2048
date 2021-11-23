@@ -13,7 +13,7 @@ function setEmptyArray() {
       };
     }
   }
-  addNewBlock(arr, 2);
+  arr = addNewBlock(arr, 2);
   return arr;
 }
 // 新增n个单元
@@ -23,8 +23,9 @@ function addNewBlock(arr, n) {
     let x = Math.floor(Math.random() * 4);
     let y = Math.floor(Math.random() * 4);
     if (arr[x][y].value == 0) {
-      arr[x][y].value = 2 * (Math.floor(Math.random() * 2) + 1);
-      arr[x][y].styles = changeColor(arr[x][y].value);
+      let num = 2 * (Math.floor(Math.random() * 2) + 1);
+      arr[x][y].styles = changeColor(num);
+      arr[x][y].value = num;
       flag++;
     }
   }
@@ -33,6 +34,7 @@ function addNewBlock(arr, n) {
 
 function pushUp(arr) {
   let steps = 0;
+  let scores = 0;
   for (let x = 0; x < 4; x++) {
     // 每一列都实施相同方法
     let head = 0;
@@ -47,10 +49,16 @@ function pushUp(arr) {
           if (arr[x][head].value == 0) {
             // 如果head为0，则该值移到head处
             // 一个一个移上去，显示出动画
-            arr[x][head].value = arr[x][i].value;
-            arr[x][head].styles = changeColor(arr[x][head].value);
-            arr[x][i].value = 0;
-            arr[x][i].styles = {};
+            for (let t = i; t > head; t--) {
+              arr[x][t - 1].styles = changeColor(arr[x][t].value);
+              arr[x][t - 1].value = arr[x][t].value;
+              arr[x][t].value = 0;
+              arr[x][t].styles = {};
+            }
+            // arr[x][head].value = arr[x][i].value;
+            // arr[x][head].styles = changeColor(arr[x][head].value);
+            // arr[x][i].value = 0;
+            // arr[x][i].styles = {};
             steps++;
             break;
             // 以崭新的head重新进行for循环
@@ -66,20 +74,40 @@ function pushUp(arr) {
                   head++;
                   break;
                 } else {
-                  arr[x][head + 1].value = arr[x][i].value;
-                  arr[x][head + 1].styles = changeColor(arr[x][head + 1].value);
-                  arr[x][i].value = 0;
-                  arr[x][i].styles = {};
+                  for (let t = i; t > head + 1; t--) {
+                    arr[x][t - 1].styles = changeColor(arr[x][t].value);
+                    arr[x][t - 1].value = arr[x][t].value;
+                    arr[x][t].value = 0;
+                    arr[x][t].styles = {};
+                  }
+                  // arr[x][head + 1].value = arr[x][i].value;
+                  // arr[x][head + 1].styles = changeColor(arr[x][head + 1].value);
+                  // arr[x][i].value = 0;
+                  // arr[x][i].styles = {};
                   steps++;
                   head++;
                   break;
                 }
               } else {
                 // 如果当前值和head值相等，则加入head中
-                arr[x][head].value = arr[x][head].value * 2;
-                arr[x][head].styles = changeColor(arr[x][head].value);
-                arr[x][i].value = 0;
-                arr[x][i].styles = {};
+                for (let t = i; t > head; t--) {
+                  if (t == head + 1) {
+                    arr[x][head].styles = changeColor(arr[x][head].value * 2);
+                    arr[x][head].value = arr[x][t].value * 2;
+                    arr[x][t].value = 0;
+                    arr[x][t].styles = {};
+                  } else {
+                    arr[x][t - 1].styles = changeColor(arr[x][t].value);
+                    arr[x][t - 1].value = arr[x][t].value;
+                    arr[x][t].value = 0;
+                    arr[x][t].styles = {};
+                  }
+                }
+                // arr[x][head].value = arr[x][head].value * 2;
+                // scores += arr[x][head].value;
+                // arr[x][head].styles = changeColor(arr[x][head].value);
+                // arr[x][i].value = 0;
+                // arr[x][i].styles = {};
                 steps++;
                 head++;
                 break;
@@ -91,11 +119,12 @@ function pushUp(arr) {
     }
   }
   if (steps != 0) arr = addNewBlock(arr, 1);
-  return [arr, steps];
+  return [steps, scores];
 }
 
 function pushRight(arr) {
   let steps = 0;
+  let scores = 0;
   for (let y = 3; y >= 0; y--) {
     let head = 3;
     let i = 3;
@@ -128,6 +157,7 @@ function pushRight(arr) {
                 }
               } else {
                 arr[head][y].value = arr[head][y].value * 2;
+                scores += arr[head][y].value;
                 arr[head][y].styles = changeColor(arr[head][y].value);
                 arr[i][y].value = 0;
                 arr[i][y].styles = {};
@@ -142,11 +172,12 @@ function pushRight(arr) {
     }
   }
   if (steps != 0) arr = addNewBlock(arr, 1);
-  return [arr, steps];
+  return [steps, scores];
 }
 
 function pushDown(arr) {
   let steps = 0;
+  let scores = 0;
   for (let x = 0; x < 4; x++) {
     let head = 3;
     let i = 3;
@@ -179,6 +210,7 @@ function pushDown(arr) {
                 }
               } else {
                 arr[x][head].value = arr[x][head].value * 2;
+                scores += arr[x][head].value;
                 arr[x][head].styles = changeColor(arr[x][head].value);
                 arr[x][i].value = 0;
                 arr[x][i].styles = {};
@@ -193,11 +225,12 @@ function pushDown(arr) {
     }
   }
   if (steps != 0) arr = addNewBlock(arr, 1);
-  return [arr, steps];
+  return [steps, scores];
 }
 
 function pushLeft(arr) {
   let steps = 0;
+  let scores = 0;
   for (let y = 0; y < 4; y++) {
     let head = 0;
     let i = 0;
@@ -230,6 +263,7 @@ function pushLeft(arr) {
                 }
               } else {
                 arr[head][y].value = arr[head][y].value * 2;
+                scores += arr[head][y].value;
                 arr[head][y].styles = changeColor(arr[head][y].value);
                 arr[i][y].value = 0;
                 arr[i][y].styles = {};
@@ -244,7 +278,7 @@ function pushLeft(arr) {
     }
   }
   if (steps != 0) arr = addNewBlock(arr, 1);
-  return [arr, steps];
+  return [steps, scores];
 }
 
 function changeColor(num) {
@@ -254,8 +288,18 @@ function changeColor(num) {
     case 4:
       return { background: "#ECE2CA", color: "#766F65" };
     case 8:
-      return { background: "#EBB57C", color: "#F9F6F2" };
+      return { background: "#EBB57C", color: "#F8F6F2" };
     case 16:
-      return { background: "#EC9B67", color: "#F9F6F2" };
+      return { background: "#EC9B67", color: "#F8F6F2" };
+    case 32:
+      return { background: "#E78367", color: "#F8F6F2" };
+    case 64:
+      return { background: "#E56948", color: "#F8F6F2" };
+    case 128:
+      return { background: "#E8D180", color: "#F8F6F2", "font-size": "300%" };
+    case 256:
+      return { background: "#E8CD72", color: "#F8F6F2", "font-size": "300%" };
+    case 512:
+      return { background: "#E8CB54", color: "#F8F6F2", "font-size": "300%" };
   }
 }
